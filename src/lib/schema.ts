@@ -48,6 +48,7 @@ export const basicDataSchema = z.object({
   plot_number: text,
   land_nature: text,
   level: text,
+  deed_image: z.string().default(""),
 });
 
 export const propertyDataSchema = z.object({
@@ -133,6 +134,7 @@ export function makeEmptySubmission(): Submission {
       plot_number: "",
       land_nature: "",
       level: "",
+      deed_image: "",
     },
     property_data: {
       is_property_halted: "نعم",

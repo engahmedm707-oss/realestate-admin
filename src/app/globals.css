@@ -236,8 +236,19 @@ input[type="number"] {
   border-color: var(--color-slate-400);
 }
 
-.report-json-details {
-  margin-top: 1.25rem;
+.report-attachment {
+  display: flex;
+  justify-content: center;
+}
+
+.report-deed-image {
+  max-width: 100%;
+  max-height: 180mm;
+  border: 1px solid var(--color-slate-200);
+  border-radius: 0.5rem;
+  object-fit: contain;
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 
 .report-json-summary {

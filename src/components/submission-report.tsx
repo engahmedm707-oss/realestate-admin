@@ -190,6 +190,19 @@ export function SubmissionReport({
         )}
       </Section>
 
+      {/* 7. المرفقات */}
+      {String(basic.deed_image ?? "").trim() && (
+        <Section title="المرفقات (صورة الصك)" number={7}>
+          <div className="report-attachment">
+            <img
+              src={String(basic.deed_image)}
+              alt="صورة الصك"
+              className="report-deed-image"
+            />
+          </div>
+        </Section>
+      )}
+
       {/* Actions */}
       <div className="no-print report-actions">
         <button type="button" onClick={print} className="report-btn report-btn-primary">

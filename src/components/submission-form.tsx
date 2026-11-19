@@ -14,6 +14,7 @@ import {
   inputClass,
 } from "./fields";
 import { RemindersEditor } from "./reminders-editor";
+import { ImageUpload } from "./image-upload";
 import {
   AlertIcon,
   CheckIcon,
@@ -335,11 +336,31 @@ export function SubmissionForm({
         );
       })}
 
-      {/* Reminders */}
+      {/* المرفقات (صورة الصك) */}
       <section className="mb-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="mb-4 flex items-center gap-3">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50 text-xs font-bold text-brand-700">
             {FIELD_GROUPS.length + 1}
+          </span>
+          <div>
+            <div className="text-sm font-bold text-slate-900">المرفقات</div>
+            <div className="text-[11px] text-slate-400">
+              صورة الصك (تُحفظ في قاعدة البيانات)
+            </div>
+          </div>
+        </div>
+        <ImageUpload
+          value={getDeep(data, ["basic_data", "deed_image"])}
+          onChange={(next) => setValue(["basic_data", "deed_image"], next)}
+          label="صورة الصك"
+        />
+      </section>
+
+      {/* Reminders */}
+      <section className="mb-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="mb-4 flex items-center gap-3">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50 text-xs font-bold text-brand-700">
+            {FIELD_GROUPS.length + 2}
           </span>
           <div>
             <div className="text-sm font-bold text-slate-900">التذكيرات</div>
