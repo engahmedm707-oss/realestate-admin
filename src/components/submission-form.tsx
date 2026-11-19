@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { makeEmptySubmission, submissionSchema, type Submission } from "@/lib/schema";
 import { getDeep, mergeDeep, setDeep } from "@/lib/utils";
@@ -25,8 +26,23 @@ const DRAFT_KEY = "realestate-admin:draft";
 
 type Issue = { path: string; message: string };
 
-export function SubmissionForm() {
-  const [data, setData] = useState<Submission>(() => makeEmptySubmission());
+type Props = {
+  initialData?: Submission;
+  recordId?: string;
+  mode?: "create" | "edit";
+};
+
+export function SubmissionForm({
+  initialData,
+  recordId,
+  mode = "create",
+}: Props = {}) {
+  const isEdit = mode === "edit" && Boolean(recordId);
+  const router = useRouter();
+
+  const [data, setData] = useState<Submission>(() =>
+    initialData ? ({ ...initialData } as Submission) : makeEmptySubmission()
+  );
   const [open, setOpen] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(FIELD_GROUPS.map((group) => [group.id, true]))
   );
@@ -36,12 +52,12 @@ export function SubmissionForm() {
   const [savedId, setSavedId] = useState<string | null>(null);
   const [draftRestored, setDraftRestored] = useState(false);
 
-  // استرجاع المسودة
+  // استرجاع المسودة — بس في وضع الإنشاء
   useEffect(() => {
+    if (isEdit) return;
     const raw = window.localStorage.getItem(DRAFT_KEY);
     if (!raw) return;
     try {
-      // مسودة فاضية = مفيش حاجة تستحق الاسترجاع
       if (raw === JSON.stringify(makeEmptySubmission())) return;
       const parsed = JSON.parse(raw);
       setData((current) => mergeDeep(current, parsed));
@@ -49,10 +65,11 @@ export function SubmissionForm() {
     } catch {
       window.localStorage.removeItem(DRAFT_KEY);
     }
-  }, []);
+  }, [isEdit]);
 
-  // حفظ المسودة تلقائيًا
+  // حفظ المسودة تلقائيًا — بس في وضع الإنشاء
   useEffect(() => {
+    if (isEdit) return;
     const timer = window.setTimeout(() => {
       try {
         window.localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
@@ -61,7 +78,7 @@ export function SubmissionForm() {
       }
     }, 600);
     return () => window.clearTimeout(timer);
-  }, [data]);
+  }, [data, isEdit]);
 
   function setValue(path: string[], value: string) {
     setData((current) => setDeep(current, path, value));
@@ -69,7 +86,11 @@ export function SubmissionForm() {
   }
 
   function discardDraft() {
-    if (!window.confirm("هتمسح كل البيانات المكتوبة والمسودة. متأكد؟")) return;
+    if (!window.confirm("هتمسح كل البيانات المكتوبة. متأكد؟")) return;
+    if (isEdit && initialData) {
+      setData({ ...initialData } as Submission);
+      return;
+    }
     window.localStorage.removeItem(DRAFT_KEY);
     setData(makeEmptySubmission());
     setDraftRestored(false);
@@ -95,8 +116,10 @@ export function SubmissionForm() {
 
     setSaving(true);
     try {
-      const response = await fetch("/api/submissions", {
-        method: "POST",
+      const url = isEdit ? `/api/submissions/${recordId}` : "/api/submissions";
+      const method = isEdit ? "PUT" : "POST";
+      const response = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(parsed.data),
       });
@@ -107,6 +130,12 @@ export function SubmissionForm() {
         setError(payload.error ?? "حصلت مشكلة أثناء الحفظ");
         if (Array.isArray(payload.issues)) setIssues(payload.issues);
         setSaving(false);
+        return;
+      }
+
+      if (isEdit) {
+        router.push(`/admin/submissions/${recordId}`);
+        router.refresh();
         return;
       }
 
@@ -129,15 +158,17 @@ export function SubmissionForm() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-          تقييم عقاري جديد
+          {isEdit ? "تعديل تقييم" : "تقييم عقاري جديد"}
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          املأ البيانات ثم اضغط حفظ — السجل بيتخزن بنفس صيغة الـ JSON المطلوبة.
+          {isEdit
+            ? "عدّل البيانات ثم اضغط حفظ — التغييرات بيتخزن في نفس السجل."
+            : "املأ البيانات ثم اضغط حفظ — السجل بيتخزن بنفس صيغة الـ JSON المطلوبة."}
         </p>
       </div>
 
       {/* Saved */}
-      {savedId && (
+      {!isEdit && savedId && (
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4">
           <div className="flex items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 text-white">

@@ -103,6 +103,18 @@ export const ArrowIcon = (p: IconProps) => (
   </Base>
 );
 
+export const EditIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z" />
+  </Base>
+);
+
+export const PrintIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z" />
+  </Base>
+);
+
 export const BuildingIcon = (p: IconProps) => (
   <Base {...p}>
     <path d="M3 21h18M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16" />

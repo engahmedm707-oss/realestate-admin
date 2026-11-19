@@ -2,7 +2,7 @@ import Link from "next/link";
 import { listSubmissions } from "@/lib/data";
 import { formatDateTime } from "@/lib/utils";
 import { DeleteButton } from "@/components/delete-button";
-import { EyeIcon, FolderIcon, PlusIcon, SearchIcon } from "@/components/icons";
+import { EyeIcon, FolderIcon, PlusIcon, SearchIcon, EditIcon } from "@/components/icons";
 
 export const metadata = {
   title: "السجلات المحفوظة | لوحة الإدارة",
@@ -119,6 +119,13 @@ export default async function SubmissionsPage({
                         >
                           <EyeIcon className="h-4 w-4" />
                           عرض
+                        </Link>
+                        <Link
+                          href={`/admin/submissions/${row.id}/edit`}
+                          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-slate-300 px-3 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
+                        >
+                          <EditIcon className="h-4 w-4" />
+                          تعديل
                         </Link>
                         <DeleteButton id={row.id} folderName={row.folder_name} compact />
                       </div>
