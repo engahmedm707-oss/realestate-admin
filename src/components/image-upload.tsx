@@ -2,8 +2,9 @@
 
 import { useRef, useState } from "react";
 import { TrashIcon } from "./icons";
+import { uploadDeedImage } from "@/lib/supabase/storage";
 
-async function compressImage(file: File): Promise<string> {
+async function compressToBlob(file: File): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -24,7 +25,14 @@ async function compressImage(file: File): Promise<string> {
           return;
         }
         ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL("image/jpeg", 0.8));
+        canvas.toBlob(
+          (blob) => {
+            if (blob) resolve(blob);
+            else reject(new Error("compression failed"));
+          },
+          "image/jpeg",
+          0.8
+        );
       };
       img.onerror = () => reject(new Error("invalid image"));
       img.src = reader.result as string;
@@ -59,16 +67,19 @@ export function ImageUpload({
     }
     setProcessing(true);
     try {
-      const dataUrl = await compressImage(file);
-      onChange(dataUrl);
-    } catch {
-      setError("فشل معالجة الصورة — جرب صورة أخرى");
+      const blob = await compressToBlob(file);
+      const url = await uploadDeedImage(blob);
+      onChange(url);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "فشل رفع الصورة";
+      setError(msg);
     } finally {
       setProcessing(false);
     }
   }
 
-  const sizeKb = value ? Math.round(value.length / 1024) : 0;
+  const isUrl = value && !value.startsWith("data:");
+  const sizeHint = isUrl ? "مرفوعة في Supabase Storage" : value ? "base64 (قديم)" : "";
 
   return (
     <div className="space-y-2">
@@ -87,9 +98,9 @@ export function ImageUpload({
           >
             <TrashIcon className="h-3.5 w-3.5" />
           </button>
-          <div className="mt-1 text-[11px] text-slate-400">
-            حجم مضغوط: ~{sizeKb} KB
-          </div>
+          {sizeHint && (
+            <div className="mt-1 text-[11px] text-slate-400">{sizeHint}</div>
+          )}
         </div>
       ) : (
         <button
@@ -99,13 +110,13 @@ export function ImageUpload({
           className="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-sm font-medium text-slate-500 transition hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700 disabled:opacity-60"
         >
           {processing ? (
-            <span>جاري المعالجة...</span>
+            <span>جاري الرفع إلى Supabase...</span>
           ) : (
             <>
               <span className="text-2xl">📷</span>
               <span>اضغط لاختيار صورة {label}</span>
               <span className="text-[11px] text-slate-400">
-                JPG/PNG — يُضغط تلقائيًا (الحد 10MB)
+                JPG/PNG — تُضغط وتُرفع إلى Supabase (الحد 10MB)
               </span>
             </>
           )}
