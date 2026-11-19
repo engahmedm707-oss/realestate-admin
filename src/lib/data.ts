@@ -42,3 +42,43 @@ export async function getSubmission(id: string): Promise<SubmissionRow | null> {
   if (error) throw new Error(error.message);
   return (data as SubmissionRow | null) ?? null;
 }
+
+export type DashboardStats = {
+  total: number;
+  thisMonth: number;
+  thisWeek: number;
+  recent: SubmissionRow[];
+};
+
+export async function getDashboardStats(): Promise<DashboardStats> {
+  if (!isSupabaseConfigured) {
+    return { total: 0, thisMonth: 0, thisWeek: 0, recent: [] };
+  }
+
+  const supabase = await createClient();
+
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+  const [totalRes, monthRes, weekRes] = await Promise.all([
+    supabase.from("submissions").select("*", { count: "exact", head: true }),
+    supabase
+      .from("submissions")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", monthStart),
+    supabase
+      .from("submissions")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", weekStart),
+  ]);
+
+  const recent = (await listSubmissions()).slice(0, 5);
+
+  return {
+    total: totalRes.count ?? 0,
+    thisMonth: monthRes.count ?? 0,
+    thisWeek: weekRes.count ?? 0,
+    recent,
+  };
+}

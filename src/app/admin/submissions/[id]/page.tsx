@@ -4,7 +4,7 @@ import { getSubmission } from "@/lib/data";
 import { filenameFromFolderName } from "@/lib/utils";
 import { SubmissionReport } from "@/components/submission-report";
 import { DeleteButton } from "@/components/delete-button";
-import { ArrowIcon, FolderIcon, EditIcon } from "@/components/icons";
+import { ArrowIcon, FolderIcon, EditIcon, CopyIcon } from "@/components/icons";
 
 export const metadata = {
   title: "عرض السجل | لوحة الإدارة",
@@ -47,6 +47,13 @@ export default async function SubmissionPage({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href={`/admin/submissions/${row.id}/duplicate`}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+          >
+            <CopyIcon className="h-4 w-4" />
+            نسخ
+          </Link>
           <Link
             href={`/admin/submissions/${row.id}/edit`}
             className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"

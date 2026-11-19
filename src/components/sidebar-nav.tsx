@@ -2,15 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FolderIcon, PlusIcon } from "./icons";
+import { BuildingIcon, FolderIcon, PlusIcon, SettingsIcon } from "./icons";
 
 const LINKS = [
-  { href: "/admin", label: "تقييم جديد", icon: PlusIcon, exact: true },
+  { href: "/admin", label: "لوحة التحكم", icon: BuildingIcon, exact: true },
+  { href: "/admin/new", label: "تقييم جديد", icon: PlusIcon, exact: true },
   {
     href: "/admin/submissions",
     label: "السجلات المحفوظة",
     icon: FolderIcon,
     exact: false,
+  },
+  {
+    href: "/admin/settings",
+    label: "الإعدادات",
+    icon: SettingsIcon,
+    exact: true,
   },
 ];
 

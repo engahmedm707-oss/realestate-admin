@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listSubmissions } from "@/lib/data";
 import { formatDateTime } from "@/lib/utils";
+import { ExportAllButton } from "@/components/export-all-button";
 import { DeleteButton } from "@/components/delete-button";
 import { EyeIcon, FolderIcon, PlusIcon, SearchIcon, EditIcon } from "@/components/icons";
 
@@ -53,6 +54,7 @@ export default async function SubmissionsPage({
         >
           بحث
         </button>
+        <ExportAllButton />
       </form>
 
       {rows.length === 0 ? (

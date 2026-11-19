@@ -158,11 +158,17 @@ export function SubmissionForm({
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-          {isEdit ? "تعديل تقييم" : "تقييم عقاري جديد"}
+          {isEdit
+            ? "تعديل تقييم"
+            : initialData
+            ? "نسخ تقييم"
+            : "تقييم عقاري جديد"}
         </h1>
         <p className="mt-1 text-sm text-slate-500">
           {isEdit
             ? "عدّل البيانات ثم اضغط حفظ — التغييرات بيتخزن في نفس السجل."
+            : initialData
+            ? "عدّل البيانات ثم اضغط حفظ — بيتخزن كسجل جديد."
             : "املأ البيانات ثم اضغط حفظ — السجل بيتخزن بنفس صيغة الـ JSON المطلوبة."}
         </p>
       </div>
